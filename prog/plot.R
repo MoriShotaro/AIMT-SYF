@@ -8,7 +8,6 @@ library(readr)
 library(stringr)
 library(ggplot2)
 library(lemon)
-library(gdxrrw)
 library(patchwork)
 
 
@@ -25,6 +24,8 @@ df <- df.all %>%
   mutate(Y5=as.numeric(Y5),Scenario=factor(Scenario,levels=c('Baseline','1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio')))
 
 year_all <- seq(2020,2050,5)
+
+dir.create(path='output',showWarnings=F)
 
 
 
@@ -164,7 +165,6 @@ g_finbar <- df_finsec %>%
 l_finene <- g_legend(g_finbar+theme(legend.position='bottom'))
 
 g_fin <- g_finarea + g_finbar + plot_layout(nrow=1, width=c(4.5,3)) + plot_annotation(tag_levels = 'a', tag_suffix = ')')
-plot(g_fin)
 
 ggsave(paste0('output/Fig1.png'),width=9,height=3.5)
 
@@ -452,6 +452,5 @@ g_stock <- df %>%
 
 l_fbar <- g_legend(g_fbar+theme(legend.position = 'right'))
 g_trade <- (g_fbar + l_fbar + plot_layout(width=c(3,1)))/g_stock
-plot(g_trade)
 
 ggsave(paste0('output/Fig6.png'),width=6.5,height=9)
