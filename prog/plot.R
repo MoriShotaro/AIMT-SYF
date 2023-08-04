@@ -149,8 +149,8 @@ g_finarea <- df_finene %>%
 
 g_finbar <- df_finsec %>%
   filter(Y5==2050,Scenario!='Baseline') %>%
-  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
   mutate(Scenario=str_remove_all(Scenario,'1.5C ')) %>% 
+  mutate(Scenario=factor(Scenario,levels=c('w/ Synfuel','w/o Synfuel','OptBio'))) %>% 
   ggplot() +
   geom_bar(aes(x=Scenario,y=value,fill=Variable),stat='identity') +
   scale_fill_manual(values=plt$Color,labels=plt$Legend,name='') +
@@ -161,6 +161,7 @@ g_finbar <- df_finsec %>%
   theme(legend.title = element_text(),
         legend.position = 'right',
         legend.text=element_text(size=10))
+plot(g_finbar)
 
 l_finene <- g_legend(g_finbar+theme(legend.position='bottom'))
 
