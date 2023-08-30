@@ -1870,3 +1870,14 @@ Fin_Ene_Liq_Hyd_syn,Final Energy|Liquids|Hydrogen synfuel
 Fin_Ene_Res_and_Com_Liq_Hyd_syn,Final Energy|Residential and Commercial|Liquids|Hydrogen synfuel
 Fin_Ene_Tra_Liq_Hyd_syn,Final Energy|Transportation|Liquids|Hydrogen synfuel
 Emi_CO2_Ene_and_Ind_Pro_inc_Dir_Air,Emissions|CO2|Energy and Industrial Processes including Direct Air
+Prm_Ene_Bio_wo_CCS,Primary Energy|Biomass|w/o CCS
+Prm_Ene_Bio_w_CCS,Primary Energy|Biomass|w/ CCS
+Car_Cap_Ind_Pro,Carbon Capture|Industrial Processes
+Car_Cap_Fos_Ene_Sup,Carbon Capture|Fossil|Energy|Supply
+Car_Cap_Fos_Ene_Dem_Ind,Carbon Capture|Fossil|Energy|Demand|Industry
+Car_Cap_Bio_Ene_Sup,Carbon Capture|Biomass|Energy|Supply
+Car_Cap_Dir_Air_Cap,Carbon Capture|Direct Air Capture
+Car_Seq_Geo_Sto_Fos,Carbon Sequestration|Geological Storage|Fossil
+Car_Seq_Geo_Sto_Oth,Carbon Sequestration|Geological Storage|Other
+Car_Seq_Geo_Sto_Bio,Carbon Sequestration|Geological Storage|Biomass
+Car_Seq_Geo_Sto_Dir_Air_Cap,Carbon Sequestration|Geological Storage|Direct Air Capture

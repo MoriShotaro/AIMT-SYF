@@ -161,7 +161,6 @@ g_finbar <- df_finsec %>%
   theme(legend.title = element_text(),
         legend.position = 'right',
         legend.text=element_text(size=10))
-plot(g_finbar)
 
 l_finene <- g_legend(g_finbar+theme(legend.position='bottom'))
 
@@ -239,7 +238,7 @@ g_prccar <- df %>%
   geom_point(aes(x=Y5,y=value,color=Scenario,shape=Scenario),stroke=0.7) +
   scale_color_manual(values=c('indianred2','deepskyblue3','darkgoldenrod2')) +
   scale_shape_manual(values=c(0,1,2)) +
-  labs(y=expression(paste('Carbon price (US$ t-',{CO[2]^-1},')'))) +
+  labs(y=expression(paste('Carbon price (US$2010 t-',{CO[2]^-1},')'))) +
   MyTheme +
   theme(legend.position=c(0.3,0.8),
         legend.text=element_text(size=10))
@@ -255,7 +254,7 @@ g_totcos <- df %>%
   mutate(Scenario=factor(Scenario,levels=c('w/ Synfuel','w/o Synfuel','OptBio'))) %>% 
   ggplot() +
   geom_bar(aes(x=Scenario,y=value),stat='identity') +
-  labs(y='Cumulative energy system cost\n(trillion US$)') +
+  labs(y='Cumulative energy system cost\n(trillion US$2010)') +
   MyTheme 
 
 g_mitcost <- g_prccar + g_totcos + plot_layout(width=c(2,1)) + plot_annotation(tag_levels='a',tag_suffix=')')
@@ -351,7 +350,7 @@ g_str <- df_str %>%
   geom_hline(yintercept=0,linetype='dashed',color='grey60',size=0.4) +
   scale_color_manual(values=c('indianred2','deepskyblue3','darkgoldenrod2')) +
   scale_shape_manual(values=c(0,1,2)) +
-  labs(y=expression(paste('Stranded investment (billion US$ ',{yr^-1},')'))) +
+  labs(y=expression(paste('Stranded investment (billion US$2010 ',{yr^-1},')'))) +
   facet_wrap(vars(Variable),nrow=1) +
   MyTheme +
   theme(legend.position='bottom',
@@ -455,3 +454,199 @@ l_fbar <- g_legend(g_fbar+theme(legend.position = 'right'))
 g_trade <- (g_fbar + l_fbar + plot_layout(width=c(3,1)))/g_stock
 
 ggsave(paste0('output/Fig6.png'),width=6.5,height=9)
+
+
+
+# Figure SI1 --------------------------------------------------------------
+
+plt <- set_plot(finene %>% 
+                  filter(!str_detect(Variable,'Bio')) %>%
+                  bind_rows(data.frame(Variable='Biomass',Legend='Biomass',Color='darkolivegreen2')) %>%
+                  mutate(Variable=as.character(Variable)) %>% 
+                  mutate(Legend=factor(Legend,levels=c('Oil',
+                                                       'Coal',
+                                                       'Gas',
+                                                       'Biomass',
+                                                       'Solar',
+                                                       'Electricity',
+                                                       'Heat',
+                                                       'Hydrogen',
+                                                       'Synfuel'))) %>% 
+                  arrange(Legend))
+
+g_finarea_all <- df_finene %>%
+  filter(Scenario!='Baseline') %>% 
+  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
+  ggplot() +
+  geom_bar(aes(x=Y5,y=value,fill=Variable),stat='identity') +
+  scale_fill_manual(values=plt$Color,labels=plt$Legend,name='') +
+  facet_wrap(vars(Scenario),nrow=1) +
+  labs(y=expression(paste('Final energy (EJ ',{yr^-1},')'))) +
+  MyTheme +
+  theme(legend.title = element_text(),
+        legend.position = 'bottom')
+
+ggsave(paste0('output/FigS1.png'),width=7,height=4)
+
+
+# Figure SI2 -------------------------------------------------------------
+
+g_finarea_sec <- df_finsec %>%
+  filter(Scenario!='Baseline') %>% 
+  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
+  ggplot() +
+  geom_bar(aes(x=Y5,y=value,fill=Variable),stat='identity') +
+  scale_fill_manual(values=plt$Color,labels=plt$Legend,name='') +
+  facet_wrap(vars(Scenario),nrow=1) +
+  labs(y=expression(paste('Final energy (EJ ',{yr^-1},')'))) +
+  MyTheme +
+  theme(legend.title = element_text(),
+        legend.position = 'bottom') +
+  facet_grid(rows=vars(Se),cols=vars(Scenario))
+
+ggsave(paste0('output/FigS2.png'),width=7,height=10)
+
+
+
+# Figure SI3 --------------------------------------------------------------
+
+df_prmene <- df %>% 
+  filter(Scenario!='Baseline') %>% 
+  filter(Variable %in% prmene$Variable, Y5%in%year_all) %>% 
+  mutate(Variable=factor(Variable,levels=rev(prmene$Variable)))
+
+plt <- set_plot(prmene)
+
+g_prm_all <- df_prmene %>%
+  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
+  ggplot() +
+  geom_bar(aes(x=Y5,y=value,fill=Variable),stat='identity') +
+  scale_fill_manual(values=plt$Color,labels=plt$Legend,name='') +
+  facet_wrap(vars(Scenario),nrow=1) +
+  labs(y=expression(paste('Primary energy (EJ ',{yr^-1},')'))) +
+  MyTheme +
+  theme(legend.title = element_text(),
+        legend.position = 'bottom')
+
+ggsave(paste0('output/FigS3.png'),width=7,height=4.5)
+
+
+
+# Figure SI4 --------------------------------------------------------------
+
+df_secele <- df %>% 
+  filter(Scenario!='Baseline') %>% 
+  filter(Variable %in% secele$Variable, Y5%in%year_all) %>% 
+  mutate(Variable=factor(Variable,levels=rev(secele$Variable)))
+
+plt <- set_plot(secele)
+
+g_ele_all <- df_secele %>%
+  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
+  ggplot() +
+  geom_bar(aes(x=Y5,y=value,fill=Variable),stat='identity') +
+  scale_fill_manual(values=plt$Color,labels=plt$Legend,name='') +
+  facet_wrap(vars(Scenario),nrow=1) +
+  labs(y=expression(paste('Power generation (EJ ',{yr^-1},')'))) +
+  MyTheme +
+  theme(legend.title = element_text(),
+        legend.position = 'bottom')
+
+ggsave(paste0('output/FigS4.png'),width=7,height=4.5)
+
+
+
+# Figure SI5 --------------------------------------------------------------
+
+df_sechyd <- df %>% 
+  filter(Scenario!='Baseline') %>% 
+  filter(Variable %in% sechyd$Variable, Y5%in%year_all) %>% 
+  mutate(Variable=factor(Variable,levels=rev(sechyd$Variable)))
+
+plt <- set_plot(sechyd)
+
+g_hyd_all <- df_sechyd %>%
+  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
+  ggplot() +
+  geom_bar(aes(x=Y5,y=value,fill=Variable),stat='identity') +
+  scale_fill_manual(values=plt$Color,labels=plt$Legend,name='') +
+  facet_wrap(vars(Scenario),nrow=1) +
+  labs(y=expression(paste('Hydrogen generation (EJ ',{yr^-1},')'))) +
+  MyTheme +
+  theme(legend.title = element_text(),
+        legend.position = 'bottom')
+
+ggsave(paste0('output/FigS5.png'),width=7,height=4)
+
+
+
+# Figure SI6 --------------------------------------------------------------
+
+df_carcap <- df %>% 
+  filter(Scenario!='Baseline') %>% 
+  filter(Variable %in% carcap$Variable, Y5%in%year_all,Variable!='Emi_CO2_Ene_Dem_AFO') %>% 
+  mutate(Variable=factor(Variable,levels=rev(carcap$Variable)))
+
+plt <- set_plot(carcap)
+
+g_car_cap <- df_carcap %>%
+  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
+  ggplot() +
+  geom_bar(aes(x=Y5,y=value/1000,fill=Variable),stat='identity') +
+  scale_fill_manual(values=plt$Color,labels=plt$Legend,name='') +
+  facet_wrap(vars(Scenario),nrow=1) +
+  labs(y=expression(paste('Carbon capture (Gt',{CO[2]},' ',{yr^-1},')'))) +
+  MyTheme +
+  theme(legend.title = element_text(),
+        legend.position = 'bottom')
+
+ggsave(paste0('output/FigS6.png'),width=7,height=4)
+
+
+
+
+# Figure SI7 --------------------------------------------------------------
+
+df_carseq <- df %>% 
+  filter(Scenario!='Baseline') %>% 
+  filter(Variable %in% carseq$Variable, Y5%in%year_all,Variable!='Emi_CO2_Ene_Dem_AFO') %>% 
+  mutate(Variable=factor(Variable,levels=carseq$Variable))
+
+plt <- set_plot(carseq)
+
+g_car_seq <- df_carseq %>%
+  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
+  ggplot() +
+  geom_bar(aes(x=Y5,y=value/1000,fill=Variable),stat='identity') +
+  scale_fill_manual(values=plt$Color,labels=plt$Legend,name='') +
+  facet_wrap(vars(Scenario),nrow=1) +
+  labs(y=expression(paste('Carbon sequestration (Gt',{CO[2]},' ',{yr^-1},')'))) +
+  MyTheme +
+  theme(legend.title = element_text(),
+        legend.position = 'bottom')
+
+ggsave(paste0('output/FigS7.png'),width=7,height=4)
+
+
+
+# Figure SI8 --------------------------------------------------------------
+
+df_emisec <- df %>% 
+  filter(Scenario!='Baseline') %>% 
+  filter(Variable %in% emisec$Variable, Y5%in%year_all,Variable!='Emi_CO2_Ene_Dem_AFO') %>% 
+  mutate(Variable=factor(Variable,levels=rev(emisec$Variable)))
+
+plt <- set_plot(emisec)
+
+g_emi_all <- df_emisec %>%
+  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
+  ggplot() +
+  geom_bar(aes(x=Y5,y=value/1000,fill=Variable),stat='identity') +
+  scale_fill_manual(values=plt$Color,labels=plt$Legend,name='') +
+  facet_wrap(vars(Scenario),nrow=1) +
+  labs(y=expression(paste({CO[2]},' emissions (Gt',{CO[2]},' ',{yr^-1},')'))) +
+  MyTheme +
+  theme(legend.title = element_text(),
+        legend.position = 'bottom')
+
+ggsave(paste0('output/FigS8.png'),width=7,height=4)
