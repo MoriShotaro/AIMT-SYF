@@ -246,8 +246,8 @@ g_prccar <- df %>%
 g_totcos <- df %>% 
   filter(Variable=='Pol_Cos_Add_Tot_Ene_Sys_Cos',Scenario!='Baseline') %>%
   filter(Y5 %in% c(2025:2050)) %>% 
-  mutate(diScenarioount=0.95^(Y5-2023)) %>%
-  mutate(value=value*diScenarioount*5/1000) %>% 
+  mutate(discount=0.95^(Y5-2023)) %>%
+  mutate(value=value*discount*5/1000) %>% 
   group_by(Scenario) %>% 
   summarise(value=sum(value)) %>% 
   mutate(Scenario=str_remove_all(Scenario,'1.5C ')) %>% 
@@ -650,3 +650,67 @@ g_emi_all <- df_emisec %>%
         legend.position = 'bottom')
 
 ggsave(paste0('output/FigS8.png'),width=7,height=4)
+
+
+# Figure SI9 --------------------------------------------------------------
+
+g_totcos2 <- df %>% 
+  filter(Variable=='Pol_Cos_Add_Tot_Ene_Sys_Cos',Scenario!='Baseline') %>%
+  filter(Y5 %in% c(2025:2050)) %>% 
+  mutate(discount5=0.95^(Y5-2023)) %>%
+  mutate(discount10=0.90^(Y5-2023)) %>%
+  mutate(`5%`=value*discount5*5/1000) %>% 
+  mutate(`10%`=value*discount10*5/1000) %>% 
+  select(-value) %>% 
+  group_by(Scenario) %>% 
+  reframe(`5%`=sum(`5%`),
+          `10%`=sum(`10%`)) %>% 
+  pivot_longer(cols=-c(Scenario),names_to='Rate',values_to='value') %>% 
+  mutate(Rate=factor(Rate,levels=c('5%','10%'))) %>% 
+  mutate(Scenario=str_remove_all(Scenario,'1.5C ')) %>% 
+  mutate(Scenario=factor(Scenario,levels=c('w/ Synfuel','w/o Synfuel','OptBio'))) %>% 
+  ggplot() +
+  geom_bar(aes(x=Scenario,y=value),stat='identity') +
+  labs(y='Cumulative energy system cost\n(trillion US$2010)') +
+  facet_wrap(vars(Rate)) +
+  MyTheme 
+
+g_mitcost <- g_totcos2
+
+ggsave(paste0('output/FigS9.png'),width=6,height=4)
+
+
+# Figure SI10 -------------------------------------------------------------
+
+df_str2 <- df %>% 
+  filter(Variable %in% c('Str_Inv_Ene_Dem_Ind','Str_Inv_Ene_Dem_Bui','Str_Inv_Ene_Dem_Tra','Str_Inv_Ene_Sup',
+                         'Str_Inv_Ene_Dem_Ind_10','Str_Inv_Ene_Dem_Bui_10','Str_Inv_Ene_Dem_Tra_10','Str_Inv_Ene_Sup_10')) %>%
+  mutate(Sector=recode(Variable,
+                       Str_Inv_Ene_Dem_Ind='Industry',Str_Inv_Ene_Dem_Bui='Buildings',Str_Inv_Ene_Dem_Tra='Transport',Str_Inv_Ene_Sup='Energy supply',
+                       Str_Inv_Ene_Dem_Ind_10='Industry',Str_Inv_Ene_Dem_Bui_10='Buildings',Str_Inv_Ene_Dem_Tra_10='Transport',Str_Inv_Ene_Sup_10='Energy supply'),
+         Rate=case_when(str_detect(Variable,'_10')~'10%',
+                        TRUE~'5%')) %>%
+  select(-Variable) %>% 
+  pivot_wider(names_from=Scenario,values_from=value) %>% 
+  mutate(across(starts_with('1.5C'),~.-Baseline)) %>% select(-Baseline) %>% 
+  pivot_longer(cols=starts_with('1.5C'),names_to='Scenario',values_to='value') %>% 
+  mutate(Sector=factor(Sector,levels=c('Industry','Buildings','Transport','Energy supply')),
+         Rate=factor(Rate,levels=c('5%','10%')),
+         Scenario=factor(Scenario,levels=c('1.5C OptBio','1.5C w/ Synfuel','1.5C w/o Synfuel')))
+
+g_str2 <- df_str2 %>%
+  filter(Y5>=2020) %>% 
+  mutate(Scenario=factor(Scenario,levels=c('1.5C w/ Synfuel','1.5C w/o Synfuel','1.5C OptBio'))) %>% 
+  ggplot() +
+  geom_path(aes(x=Y5,y=value,color=Scenario,linetype=Rate),size=0.4) +
+  geom_point(aes(x=Y5,y=value,color=Scenario,shape=Scenario),stroke=0.7) +
+  geom_hline(yintercept=0,linetype='dashed',color='grey60',size=0.4) +
+  scale_color_manual(values=c('indianred2','deepskyblue3','darkgoldenrod2')) +
+  scale_shape_manual(values=c(0,1,2)) +
+  labs(y=expression(paste('Stranded investment (billion US$2010 ',{yr^-1},')'))) +
+  facet_wrap(vars(Sector),nrow=1) +
+  MyTheme +
+  theme(legend.position='bottom',
+        legend.text=element_text(size=10))
+
+ggsave(paste0('output/FigS10.png'),width=8,height=4)

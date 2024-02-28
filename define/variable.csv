@@ -1848,6 +1848,10 @@ Str_Inv_Ene_Dem_Ind,Stranded Investment|Energy Demand|Industry
 Str_Inv_Ene_Dem_Bui,Stranded Investment|Energy Demand|Buildings
 Str_Inv_Ene_Dem_Tra,Stranded Investment|Energy Demand|Transportation
 Str_Inv_Ene_Sup,Stranded Investment|Energy Supply
+Str_Inv_Ene_Dem_Ind_10,Stranded Investment|Energy Demand|Industry|10%
+Str_Inv_Ene_Dem_Bui_10,Stranded Investment|Energy Demand|Buildings|10%
+Str_Inv_Ene_Dem_Tra_10,Stranded Investment|Energy Demand|Transportation|10%
+Str_Inv_Ene_Sup_10,Stranded Investment|Energy Supply|10%
 Trd_Coa,Trade|Primary Energy|Coal|Energy
 Trd_Cru,Trade|Primary Energy|Oil|Energy
 Trd_Oil,Trade|Secondary Energy|Liquids|Oil|Energy
